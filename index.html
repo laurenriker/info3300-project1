@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Info 3300 Project</title>
+
+  </head>
+
+  <body>
+   <svg id="bargraph" height="600" width="600"></svg>
+
+   <script>
+    d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data){
+        //data = data.filter( (d) => {return d['gdp'] != 0 && d['life'] != 0 && d['pop'] != 0;}  );
+
+        //We need to filter by state some how: 
+        //Data = data.filter((d)=> {return d[State] == ‘New York’
+
+        const svg = d3.select("svg#bargraph");
+        const width = svg.attr("width");
+        const height = svg.attr("height");
+        const margins = {top: 10, right: 10, bottom: 50, left: 50};
+        const chartWidth = width - margins.left - margins.right;
+        const chartHeight = height - margins.top - margins.bottom;
+
+        const age = d3.extent(data, d => d['Cohort']);
+        const drivers = d3.extent(data, d => d['Drivers']);
+
+        //creating linear scale functions
+        const xScale = d3.scaleLinear()
+            .domain(age)
+            .range([0, chartWidth]); //range of x-axis
+
+        const yScale = d3.scaleLog()
+            .domain(drivers)
+            .range([chartHeight, 0]); //range of y-axis
+
+       
+    });
+
+   </script>
+
+
+  </body>
+
+  </html>
