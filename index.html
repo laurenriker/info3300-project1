@@ -1,45 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
   <meta charset="UTF-8">
   <title>Info 3300 Project</title>
-
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    
+    .gridlines line {
+      stroke: #bbb;
+    }
+    
+    .gridlines .domain {
+      stroke: none;
+    }
+  
+  </style>
   </head>
 
   <body>
    <svg id="bargraph" height="600" width="600"></svg>
 
    <script>
+     
+    const svg = d3.select("svg#bargraph");
+    const width = svg.attr("width");
+    const height = svg.attr("height");
+    const margins = {top: 10, right: 10, bottom: 50, left: 50};
+    const chartWidth = width - margins.left - margins.right;
+    const chartHeight = height - margins.top - margins.bottom;
+    let graph = svg.append('g');
+    let chartArea = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
+
     d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data){
-        //data = data.filter( (d) => {return d['gdp'] != 0 && d['life'] != 0 && d['pop'] != 0;}  );
+  
+      data = data.filter((d)=> {return d['State'] == ‘New York’;}  );
 
-        //We need to filter by state some how: 
-        //Data = data.filter((d)=> {return d[State] == ‘New York’
+      data.forEach(d) => {
+          d['female'] = d['Gender'] == 'Female';
+          d['male'] = d['Gender'] == 'Male';
+  
+      });
 
-        const svg = d3.select("svg#bargraph");
-        const width = svg.attr("width");
-        const height = svg.attr("height");
-        const margins = {top: 10, right: 10, bottom: 50, left: 50};
-        const chartWidth = width - margins.left - margins.right;
-        const chartHeight = height - margins.top - margins.bottom;
 
-        const age = d3.extent(data, d => d['Cohort']);
-        const drivers = d3.extent(data, d => d['Drivers']);
+        const ageExtent = d3.extent(data, d => d['Cohort']);
+        const driversExtent = d3.extent(data, d => d['Drivers']);
 
-        //creating linear scale functions
+
         const xScale = d3.scaleLinear()
-            .domain(age)
-            .range([0, chartWidth]); //range of x-axis
+            .domain(ageExtent)
+            .range([0, chartWidth]); 
 
         const yScale = d3.scaleLog()
-            .domain(drivers)
-            .range([chartHeight, 0]); //range of y-axis
+            .domain(driversExtent)
+            .range([chartHeight, 0]); 
 
+        let leftAxis = d3.axisLeft(yScale);
+        graph.append('g')
+            .attr('class', 'y axis')
+            .attr('transform',`translate(${margins.left-10},${margins.top})`) 
+            .call(leftAxis);
+        let leftGridlines = d3.axisLeft(yScale)
+            .tickSize(-chartWidth-10)
+            .tickFormat('');
+        graph.append('g')
+            .attr('class', 'y gridlines')
+            .attr('transform',`translate(${margins.left-10},${margins.top})`)
+            .call(leftGridlines);    
+
+
+
+        let bottomAxis = d3.axisBottom(xScale);
+        graph.append('g')
+            .attr('class', 'x axis')
+            .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
+            .call(bottomAxis);    
+        let bottomGridlines = d3.axisBottom(xScale)
+            .tickSize(-chartHeight-10)
+            .tickFormat('');
+        graph.append('g')
+            .attr('class', 'x gridlines')
+            .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
+            .call(bottomGridlines);  
+
+       chartArea.selectAll('rect.bar').data( data )
+            .join('rect').attr('class','bar')
+            .attr("fill", "blue")
+            .attr("x", d => xScale(d.Cohort))
+            .attr("y", d => yScale(d.Drivers))
+            .attr("height", d => yScale(0) - yScale(d.Drivers))
+            .attr("width", xScale.bandwidth());
        
     });
 
    </script>
-
 
   </body>
 
