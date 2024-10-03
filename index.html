@@ -19,6 +19,8 @@
 
   <body>
    <svg id="bargraph" height="600" width="600"></svg>
+    <div id="gender-button"></div>
+
 
    <script>
      
@@ -89,6 +91,17 @@
             .attr("y", d => yScale(d.Drivers))
             .attr("height", d => yScale(0) - yScale(d.Drivers))
             .attr("width", xScale.bandwidth());
+
+       const allKeys = Object.keys(data).sort();
+        allKeys.forEach(d => {
+          d3.select("div#gender-button")
+            .append("button")
+            .text(d)
+            .on("click", function() {
+              updateBarsAnimated(d);
+            })
+        });
+        updateBarsAnimated('Male');
        
     });
 
