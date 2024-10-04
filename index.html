@@ -36,6 +36,8 @@
     d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data){
   
       data = data.filter((d)=> {return d['State'] == ‘New York’;}  );
+      data = data.filter((d)=> {return d['Year'] == ‘2017’;}  );
+
 
       data.forEach(d) => {
           d['female'] = d['Gender'] == 'Female';
