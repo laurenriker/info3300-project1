@@ -18,7 +18,7 @@
   </head>
 
   <body>
-   <svg id="bargraph" height="600" width="600"></svg>
+   <svg id="bargraph" height="600" width="1000"></svg>
     <div id="gender-button"></div>
 
 
@@ -27,21 +27,24 @@
     const svg = d3.select("svg#bargraph");
     const width = svg.attr("width");
     const height = svg.attr("height");
-    const margins = {top: 10, right: 10, bottom: 50, left: 50};
+    const margins = {top: 10, right: 10, bottom: 100, left: 100};
     const chartWidth = width - margins.left - margins.right;
     const chartHeight = height - margins.top - margins.bottom;
     let graph = svg.append('g');
-    let chartArea = svg.append("g").attr("transform",`translate(${margin.left},${margin.top})`);
+    let chartArea = svg.append('g').attr("transform",`translate(${margins.left},${margins.top})`);
 
     d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data){
+      console.log(data)
   
-      data = data.filter((d)=> {return d['State'] == ‘New York’;}  );
-      data = data.filter((d)=> {return d['Year'] == ‘2017’;}  );
+      data = data.filter((d)=> {return d['State'] == 'New York';}  );
+      console.log(data)
+      data = data.filter((d)=> {return d['Year'] == 2017;}  );
+      console.log(data)
 
 
-      data.forEach(d) => {
-          d['female'] = d['Gender'] == 'Female';
-          d['male'] = d['Gender'] == 'Male';
+      data.forEach((d) => {
+          d['female'] = (d['Gender'] == 'Female');
+          d['male'] = (d['Gender'] == 'Male');
   
       });
 
@@ -50,11 +53,13 @@
         const driversExtent = d3.extent(data, d => d['Drivers']);
 
 
-        const xScale = d3.scaleLinear()
-            .domain(ageExtent)
-            .range([0, chartWidth]); 
+        const driverages = d3.map(data, d => d.Cohort)
+        const xScale = d3.scaleBand()
+            .domain(driverages)
+            .range([0, chartWidth])
+            .padding(0.10); 
 
-        const yScale = d3.scaleLog()
+        const yScale = d3.scaleLinear()
             .domain(driversExtent)
             .range([chartHeight, 0]); 
 
@@ -78,32 +83,32 @@
             .attr('class', 'x axis')
             .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
             .call(bottomAxis);    
-        let bottomGridlines = d3.axisBottom(xScale)
-            .tickSize(-chartHeight-10)
-            .tickFormat('');
-        graph.append('g')
-            .attr('class', 'x gridlines')
-            .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
-            .call(bottomGridlines);  
+        // let bottomGridlines = d3.axisBottom(xScale)
+        //     .tickSize(-chartHeight-10)
+        //     .tickFormat('');
+        // graph.append('g')
+        //     .attr('class', 'x gridlines')
+        //     .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
+        //     .call(bottomGridlines);  
 
-       chartArea.selectAll('rect.bar').data( data )
+        chartArea.selectAll('rect.bar').data(data)
             .join('rect').attr('class','bar')
-            .attr("fill", "blue")
+            .attr("fill", "darkblue")
             .attr("x", d => xScale(d.Cohort))
             .attr("y", d => yScale(d.Drivers))
             .attr("height", d => yScale(0) - yScale(d.Drivers))
             .attr("width", xScale.bandwidth());
 
-       const allKeys = Object.keys(data).sort();
-        allKeys.forEach(d => {
-          d3.select("div#gender-button")
-            .append("button")
-            .text(d)
-            .on("click", function() {
-              updateBarsAnimated(d);
-            })
-        });
-        updateBarsAnimated('Male');
+      //  const allKeys = Object.keys(data).sort();
+      //   allKeys.forEach(d => {
+      //     d3.select("div#gender-button")
+      //       .append("button")
+      //       .text(d)
+      //       .on("click", function() {
+      //         updateBarsAnimated(d);
+      //       })
+      //   });
+      //   updateBarsAnimated('Male');
        
     });
 
