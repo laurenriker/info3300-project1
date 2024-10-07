@@ -1,116 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
   <meta charset="UTF-8">
   <title>Info 3300 Project</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
-    
     .gridlines line {
       stroke: #bbb;
     }
-    
     .gridlines .domain {
       stroke: none;
     }
-  
   </style>
-  </head>
+</head>
 
-  <body>
-   <svg id="bargraph2017" height="600" width="1000"></svg>
-   <svg id="bargraph2016" height="600" width="1000"></svg>
-   <svg id="bargraph2015" height="600" width="1000"></svg>
+<body>
+  <svg id="bargraph2017" height="600" width="1000"></svg>
+  <svg id="bargraph2016" height="600" width="1000"></svg>
+  <svg id="bargraph2015" height="600" width="1000"></svg>
 
+  <script>
+    d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data) {
+      data = data.filter((d) => d['State'] == 'New York');
 
-   <script>
-     
-    const svg = d3.select("svg#bargraph2017");
-    const width = svg.attr("width");
-    const height = svg.attr("height");
-    const margins = {top: 10, right: 10, bottom: 100, left: 100};
-    const chartWidth = width - margins.left - margins.right;
-    const chartHeight = height - margins.top - margins.bottom;
-    let graph = svg.append('g');
-    let chartArea = svg.append('g').attr("transform",`translate(${margins.left},${margins.top})`);
+      function drawBarChart(chartAreaG, data, year) {
+        const svg = d3.select(chartAreaG);
+        const dataYear = data.filter((d) => d['Year'] == year);
+        const dataMale = dataYear.filter((d) => d['Gender'] == 'Male');
+        const dataFemale = dataYear.filter((d) => d['Gender'] == 'Female');
 
-    d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data){
-      console.log(data)
-  
-      data = data.filter((d)=> {return d['State'] == 'New York';}  );
-      console.log(data)
-      data = data.filter((d)=> {return d['Year'] == 2017;}  );
-      dataMale = data.filter((d)=> {return d['Gender'] == 'Male';}  );
-      dataFemale = data.filter((d)=> {return d['Gender'] == 'Female';}  );
+        const width = svg.attr("width");
+        const height = svg.attr("height");
+        const margins = { top: 10, right: 10, bottom: 100, left: 100 };
+        const chartWidth = width - margins.left - margins.right;
+        const chartHeight = height - margins.top - margins.bottom;
 
+        let chartArea = svg.append('g').attr("transform", `translate(${margins.left},${margins.top})`);
 
-      const ageExtent = d3.extent(data, d => d['Cohort']);
-      const driversExtent = d3.extent(data, d => d['Drivers']);
+        const ageExtent = d3.extent(data, d => d['Cohort']);
+        const driversExtent = d3.extent(data, d => d['Drivers']);
 
+        const driverages = d3.map(data, d => d.Cohort);
+        const xScale = d3.scaleBand()
+          .domain(driverages)
+          .range([0, chartWidth])
+          .padding(0.35);
 
-      const driverages = d3.map(data, d => d.Cohort)
-      const xScale = d3.scaleBand()
-            .domain(driverages)
-            .range([0, chartWidth])
-            .padding(0.35); 
+        const yScale = d3.scaleLinear()
+          .domain(driversExtent)
+          .range([chartHeight, 0]);
 
-      const yScale = d3.scaleLinear()
-            .domain(driversExtent)
-            .range([chartHeight, 0]); 
+        let leftAxis = d3.axisLeft(yScale);
+        chartArea.append('g')  // Use chartArea for axes
+          .attr('class', 'y axis')
+          .attr('transform', `translate(${margins.left-10},${margins.top})`)
+          .call(leftAxis);
 
-      let leftAxis = d3.axisLeft(yScale);
-      graph.append('g')
-            .attr('class', 'y axis')
-            .attr('transform',`translate(${margins.left-10},${margins.top})`) 
-            .call(leftAxis);
-      let leftGridlines = d3.axisLeft(yScale)
-            .tickSize(-chartWidth-10)
-            .tickFormat('');
-      graph.append('g')
-            .attr('class', 'y gridlines')
-            .attr('transform',`translate(${margins.left-10},${margins.top})`)
-            .call(leftGridlines);    
+        let leftGridlines = d3.axisLeft(yScale)
+          .tickSize(-chartWidth - 10)
+          .tickFormat('');
+        chartArea.append('g')  // Use chartArea for gridlines
+          .attr('class', 'y gridlines')
+          .attr('transform', `translate(${margins.left-10},${margins.top})`)
+          .call(leftGridlines);
 
+        let bottomAxis = d3.axisBottom(xScale);
+        chartArea.append('g')  // Use chartArea for the x axis
+          .attr('class', 'x axis')
+          .attr('transform', `translate(${margins.left},${chartHeight + margins.top + 10})`)
+          .call(bottomAxis);
 
-
-      let bottomAxis = d3.axisBottom(xScale);
-      graph.append('g')
-            .attr('class', 'x axis')
-            .attr('transform',`translate(${margins.left},${chartHeight+margins.top+10})`)
-            .call(bottomAxis);     
-
-      console.log(data)
-
-      // function drawBarChart(chartAreaG, data, d['Year']) {
-      //   const svg = d3.select("svg#bargraph2017");
-
-      // }
-
-
-
-
-      chartArea.selectAll('rect.barFemale').data(dataFemale)
-            .join('rect').attr('class','barFemale')
-            .attr("fill", "pink")
-            .attr("x", d => xScale(d.Cohort)-1)
-            .attr("y", d => yScale(d.Drivers))
-            .attr("height", d => yScale(0) - yScale(d.Drivers))
-            .attr("width", (xScale.bandwidth()/2));
+        chartArea.selectAll('rect.barFemale').data(dataFemale)
+          .join('rect').attr('class', 'barFemale')
+          .attr("fill", "pink")
+          .attr("x", d => xScale(d.Cohort) - 1)
+          .attr("y", d => yScale(d.Drivers))
+          .attr("height", d => yScale(0) - yScale(d.Drivers))
+          .attr("width", (xScale.bandwidth() / 2));
 
         chartArea.selectAll('rect.barMale').data(dataMale)
-            .join('rect').attr('class','barMale')
-            .attr("fill", "lightblue")
-            .attr("x", d => xScale(d.Cohort)+(xScale.bandwidth()/2))
-            .attr("y", d => yScale(d.Drivers))
-            .attr("height", d => yScale(0) - yScale(d.Drivers))
-            .attr("width", (xScale.bandwidth()/2));
+          .join('rect').attr('class', 'barMale')
+          .attr("fill", "lightblue")
+          .attr("x", d => xScale(d.Cohort) + (xScale.bandwidth() / 2))
+          .attr("y", d => yScale(d.Drivers))
+          .attr("height", d => yScale(0) - yScale(d.Drivers))
+          .attr("width", (xScale.bandwidth() / 2));
+      }
 
-       
+      drawBarChart("#bargraph2017", data, 2017);
+      drawBarChart("#bargraph2016", data, 2016);
+      drawBarChart("#bargraph2015", data, 2015);
     });
+  </script>
 
-
-   </script>
-
-  </body>
-
-  </html>
+</body>
+</html>
