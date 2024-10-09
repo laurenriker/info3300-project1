@@ -22,8 +22,7 @@
 
   <script>
     d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data) {
-      data = data.filter((d) => d['State'] == 'New York');
-
+      data = data.filter((d) => d['State'] == 'New York' && d['Cohort'] !== 'Under 20' && d['Cohort'] !== '20-24');
       function drawBarChart(chartAreaG, data, year) {
         const svg = d3.select(chartAreaG);
         const dataYear = data.filter((d) => d['Year'] == year);
