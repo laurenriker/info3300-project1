@@ -17,13 +17,17 @@
 
 <body>
   <svg id="bargraph2018" height="600" width="1000"></svg>
+  <div id = "legend1"></div>
   <svg id="bargraph2017" height="600" width="1000"></svg>
+  <div id = "legend2"></div>
   <svg id="bargraph2016" height="600" width="1000"></svg>
+  <div id = "legend3"></div>
 
   <script>
     d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data) {
       data = data.filter((d) => d['State'] == 'New York' && d['Cohort'] !== 'Under 20' && d['Cohort'] !== '20-24');
-      function drawBarChart(chartAreaG, data, year) {
+      function drawBarChart(chartAreaG, data, year, legend_name) {
+        const legend = d3.select(legend_name);
         const svg = d3.select(chartAreaG);
         const dataYear = data.filter((d) => d['Year'] == year);
         const dataMale = dataYear.filter((d) => d['Gender'] == 'Male');
@@ -65,7 +69,6 @@
               .attr('text-anchor', 'middle')
               .text('Number of Drivers');
 
-
         svg.append('text')
               .attr('x', width / 2)
               .attr('y', margins.left + 450)
@@ -80,6 +83,13 @@
               .attr('font-size', '15px')
               .text('The Number of Drivers per age group in ' + year);       
 
+        legend.append('span')
+          .text('Female')
+          .style('color', 'pink');
+        
+        legend.append('span')
+          .text('Male')
+          .style('color', 'lightblue');
 
 
         let leftGridlines = d3.axisLeft(yScale)
@@ -114,9 +124,9 @@
           .attr("width", (xScale.bandwidth() / 2));
       }
 
-      drawBarChart("#bargraph2018", data, 2018);
-      drawBarChart("#bargraph2017", data, 2017);
-      drawBarChart("#bargraph2016", data, 2016);
+      drawBarChart("#bargraph2018", data, 2018, '#legend1');
+      drawBarChart("#bargraph2017", data, 2017, '#legend2');
+      drawBarChart("#bargraph2016", data, 2016, '#legend3');
     });
   </script>
 
