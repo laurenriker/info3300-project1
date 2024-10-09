@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,7 +35,7 @@
         const margins = { top: 10, right: 10, bottom: 100, left: 100 };
         const chartWidth = width - margins.left - margins.right;
         const chartHeight = height - margins.top - margins.bottom;
-
+        let grid = svg.append('g');
         let chartArea = svg.append('g').attr("transform", `translate(${margins.left},${margins.top})`);
 
         const ageExtent = d3.extent(data, d => d['Cohort']);
@@ -51,7 +52,7 @@
           .range([chartHeight, 0]);
 
         let leftAxis = d3.axisLeft(yScale);
-        chartArea.append('g')  // Use chartArea for axes
+        grid.append('g')  
           .attr('class', 'y axis')
           .attr('transform', `translate(${margins.left-10},${margins.top})`)
           .call(leftAxis);
@@ -59,13 +60,13 @@
         let leftGridlines = d3.axisLeft(yScale)
           .tickSize(-chartWidth - 10)
           .tickFormat('');
-        chartArea.append('g')  // Use chartArea for gridlines
+        grid.append('g')  
           .attr('class', 'y gridlines')
           .attr('transform', `translate(${margins.left-10},${margins.top})`)
           .call(leftGridlines);
 
         let bottomAxis = d3.axisBottom(xScale);
-        chartArea.append('g')  // Use chartArea for the x axis
+        grid.append('g') 
           .attr('class', 'x axis')
           .attr('transform', `translate(${margins.left},${chartHeight + margins.top + 10})`)
           .call(bottomAxis);
