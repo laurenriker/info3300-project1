@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,9 +21,12 @@
 
   <script>
     d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data) {
+      //Originally filter the data to only get NY
       data = data.filter((d) => d['State'] == 'New York' && d['Cohort'] !== 'Under 20' && d['Cohort'] !== '20-24');
+      //Function that allows us to draw multiple charts
       function drawBarChart(chartAreaG, data, year) {
         const svg = d3.select(chartAreaG);
+        //Filter the data again to get the specific year we want, then male and female
         const dataYear = data.filter((d) => d['Year'] == year);
         const dataMale = dataYear.filter((d) => d['Gender'] == 'Male');
         const dataFemale = dataYear.filter((d) => d['Gender'] == 'Female');
@@ -40,8 +41,9 @@
 
         const ageExtent = d3.extent(data, d => d['Cohort']);
         const driversExtent = d3.extent(data, d => d['Drivers']);
-
         const driverages = d3.map(data, d => d.Cohort);
+
+        //Creating x and y scales
         const xScale = d3.scaleBand()
           .domain(driverages)
           .range([0, chartWidth])
@@ -50,8 +52,6 @@
         const yScale = d3.scaleLinear()
           .domain(driversExtent)
           .range([chartHeight, 0]);
-        
-        
 
         let leftAxis = d3.axisLeft(yScale);
         grid.append('g')  
@@ -59,6 +59,7 @@
           .attr('transform', `translate(${margins.left-10},${margins.top})`)
           .call(leftAxis);
         
+        //y-axis label
         svg.append('text')
               .attr('x', - (chartHeight / 2)-60)
               .attr('y', margins.left-70)
@@ -66,6 +67,7 @@
               .attr('text-anchor', 'middle')
               .text('Number of Drivers');
 
+        //x-axis label
         svg.append('text')
               .attr('x', width / 2)
               .attr('y', margins.left + 450)
@@ -73,6 +75,7 @@
               .attr('font-size', '15px')
               .text('Age Groups');            
 
+        //Title label
         svg.append('text')
               .attr('x', width / 2)
               .attr('y', margins.left-64)
@@ -85,9 +88,8 @@
               .attr('text-anchor', 'middle')
               .attr('font-size', '25px')
               .text(year);                       
-
-                 
-
+  
+        //Legend labels
         svg.append('text')
               .attr('x', width / 2 - 300)
               .attr('y', margins.left + 470)
@@ -104,6 +106,7 @@
               .style('color', 'lightblue')
               .text('Male');   
 
+        //Legend rectangles
         svg.append('rect')
           .join('rect')
           .attr('class', 'barFemale')
@@ -112,7 +115,6 @@
           .attr("y", margins.left + 457)
           .attr("height", 15)
           .attr("width", 15);
-
 
         svg.append('rect')
           .join('rect')
@@ -123,15 +125,7 @@
           .attr("height", 15)
           .attr("width", 15);
         
-        
-
-
-
-  
-        
-          
-
-
+        //Grid lines: just going in the horizontal direction
         let leftGridlines = d3.axisLeft(yScale)
           .tickSize(-chartWidth - 10)
           .tickFormat('');
@@ -140,13 +134,13 @@
           .attr('transform', `translate(${margins.left-10},${margins.top})`)
           .call(leftGridlines);
 
-
         let bottomAxis = d3.axisBottom(xScale);
         grid.append('g') 
           .attr('class', 'x axis')
           .attr('transform', `translate(${margins.left},${chartHeight + margins.top + 10})`)
           .call(bottomAxis);
 
+        //Creating the two bars for male and female
         chartArea.selectAll('rect.barFemale').data(dataFemale)
           .join('rect').attr('class', 'barFemale')
           .attr("fill", "pink")
