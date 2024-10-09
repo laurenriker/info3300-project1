@@ -16,9 +16,9 @@
 </head>
 
 <body>
+  <svg id="bargraph2018" height="600" width="1000"></svg>
   <svg id="bargraph2017" height="600" width="1000"></svg>
   <svg id="bargraph2016" height="600" width="1000"></svg>
-  <svg id="bargraph2015" height="600" width="1000"></svg>
 
   <script>
     d3.csv("Licensed_Drivers.csv", d3.autoType).then(function(data) {
@@ -31,7 +31,7 @@
 
         const width = svg.attr("width");
         const height = svg.attr("height");
-        const margins = { top: 10, right: 10, bottom: 100, left: 100 };
+        const margins = { top: 20, right: 20, bottom: 100, left: 100 };
         const chartWidth = width - margins.left - margins.right;
         const chartHeight = height - margins.top - margins.bottom;
         let grid = svg.append('g');
@@ -49,12 +49,38 @@
         const yScale = d3.scaleLinear()
           .domain(driversExtent)
           .range([chartHeight, 0]);
+        
+        
 
         let leftAxis = d3.axisLeft(yScale);
         grid.append('g')  
           .attr('class', 'y axis')
           .attr('transform', `translate(${margins.left-10},${margins.top})`)
           .call(leftAxis);
+        
+        svg.append('text')
+              .attr('x', - (chartHeight / 2)-60)
+              .attr('y', margins.left-70)
+              .attr('transform', 'rotate(-90)')
+              .attr('text-anchor', 'middle')
+              .text('Number of Drivers');
+
+
+        svg.append('text')
+              .attr('x', width / 2)
+              .attr('y', margins.left + 450)
+              .attr('text-anchor', 'middle')
+              .attr('font-size', '15px')
+              .text('Age Groups');            
+
+        svg.append('text')
+              .attr('x', width / 2)
+              .attr('y', margins.left-70)
+              .attr('text-anchor', 'middle')
+              .attr('font-size', '15px')
+              .text('The Number of Drivers per age group in ' + year);       
+
+
 
         let leftGridlines = d3.axisLeft(yScale)
           .tickSize(-chartWidth - 10)
@@ -63,6 +89,7 @@
           .attr('class', 'y gridlines')
           .attr('transform', `translate(${margins.left-10},${margins.top})`)
           .call(leftGridlines);
+
 
         let bottomAxis = d3.axisBottom(xScale);
         grid.append('g') 
@@ -87,9 +114,9 @@
           .attr("width", (xScale.bandwidth() / 2));
       }
 
+      drawBarChart("#bargraph2018", data, 2018);
       drawBarChart("#bargraph2017", data, 2017);
       drawBarChart("#bargraph2016", data, 2016);
-      drawBarChart("#bargraph2015", data, 2015);
     });
   </script>
 
