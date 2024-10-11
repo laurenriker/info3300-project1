@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Info 3300 Project</title>
+  <title>Info 3300 Project 1</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     .gridlines line {
@@ -33,7 +34,7 @@
 
         const width = svg.attr("width");
         const height = svg.attr("height");
-        const margins = { top: 20, right: 20, bottom: 100, left: 100 };
+        const margins = { top: 50, right: 20, bottom: 100, left: 100 };
         const chartWidth = width - margins.left - margins.right;
         const chartHeight = height - margins.top - margins.bottom;
         let grid = svg.append('g');
@@ -78,16 +79,17 @@
         //Title label
         svg.append('text')
               .attr('x', width / 2)
-              .attr('y', margins.left-64)
+              .attr('y', margins.left-50)
               .attr('text-anchor', 'middle')
               .attr('font-size', '20px')
               .text('The Number of Drivers in New York per age group')
         svg.append('text')
               .attr('x', width / 2)
-              .attr('y', margins.left -80)
+              .attr('y', margins.left -75)
               .attr('text-anchor', 'middle')
               .attr('font-size', '25px')
-              .text(year);                       
+              .text(year);     
+              
   
         //Legend labels
         svg.append('text')
